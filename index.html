@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">   
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">        
+        <title>To-Do List</title>
+    </head>
+    <style>
+      .btn-right {
+          position: absolute;
+          top: 5px; 
+          right: 80px;   
+        }
+
+        .btn-next-right {
+          position: absolute;
+          top: 5px; 
+          right: 10px; 
+        }   
+    </style>
+    <body>
+        <div class="container">
+            <div class="card">
+                <h1 class="card-header">Lista de Compras</h1>
+                <div class="card-body">
+                    <div class="input-group mb-3">
+                        <input type="text" id="campo" class="form-control" placeholder="Digite o item" name="campo" autofocus>
+                        <div class="input-group-append">
+                            <button onclick="addTarefa()" class="btn btn-primary" type="button" id="botaoSalvar">Cadastrar</button>
+                        </div>
+                    </div>
+                    <div id="lista"></div>
+                </div>
+            </div>
+        </div>
+        <script>  
+          document.addEventListener('DOMContentLoaded', () => {
+            carregarTarefas();
+        }); 
+
+            function addTarefa(){
+                
+                const inputTarefa = document.getElementById("campo");
+                const listaTarefa = document.getElementById("lista");
+
+                if(inputTarefa.value === ''){
+                    alert("Uma tarefa precisa ser informada!");
+                    return;
+                }
+
+                const tarefa = document.createElement('li');
+                tarefa.setAttribute('class', 'list-group-item list-group-item-action');
+
+                const textoTarefa = document.createElement('span');
+                textoTarefa.textContent = inputTarefa.value;
+
+                const botaoEditar = document.createElement('button');
+                botaoEditar.setAttribute('class', 'btn-next-right btn btn-primary');
+
+                const botaoExcluir = document.createElement('button');
+                botaoExcluir.setAttribute('class', 'btn-right btn btn-primary');
+
+                botaoEditar.textContent = 'Editar';
+                botaoEditar.addEventListener('click', () => editar(textoTarefa));
+
+                botaoExcluir.textContent = 'Excluir';
+                botaoExcluir.addEventListener('click', () => excluir(tarefa));
+
+                tarefa.appendChild(textoTarefa);
+                tarefa.appendChild(botaoEditar);
+                tarefa.appendChild(botaoExcluir)
+
+                listaTarefa.appendChild(tarefa);
+                
+                salvarDadosNoStorage();
+
+                inputTarefa.value = '';
+
+            }
+
+            function editar(textoTarefa){
+                const textoAtt = prompt('Editar Tarefa:', textoTarefa.textContent);
+                if(textoAtt !== null){
+                    textoTarefa.textContent = textoAtt;
+                    salvarDadosNoStorage();
+                }
+            }
+
+            function excluir(tarefa){
+                const confirmDelete = confirm('Tem certeza de que deseja excluir esta tarefa?');
+                if (confirmDelete) {
+                tarefa.parentNode.removeChild(tarefa);
+                salvarDadosNoStorage();
+                }
+            }
+
+            function salvarDadosNoStorage(){
+                const listaTarefa = document.getElementById("lista");
+                const tarefas = Array.from(listaTarefa.children).map(tarefa => ({
+                    text: tarefa.querySelector('span').textContent
+                }));
+                localStorage.setItem('tarefas', JSON.stringify(tarefas));
+            }
+
+            function carregarTarefas(){
+                debugger;
+                const listaTarefa = document.getElementById("lista");
+                const tarefasSalvas = localStorage.getItem('tarefas');
+
+                if(tarefasSalvas){
+                    const tarefas = JSON.parse(tarefasSalvas);
+
+                    tarefas.forEach(element => {
+                        const tarefa = document.createElement('li');
+                        tarefa.setAttribute('class', 'list-group-item list-group-item-action');
+
+                        const textoTarefa = document.createElement('span');
+                        textoTarefa.textContent = element.text;
+
+                        const botaoEditar = document.createElement('button');
+                        botaoEditar.setAttribute('class', 'btn-next-right btn btn-primary');
+
+                        const botaoExcluir = document.createElement('button');
+                        botaoExcluir.setAttribute('class', 'btn-right btn btn-primary');
+
+                        botaoEditar.textContent = 'Editar';
+                        botaoEditar.addEventListener('click', () => editar(textoTarefa));
+
+                        botaoExcluir.textContent = 'Excluir';
+                        botaoExcluir.addEventListener('click', () => excluir(tarefa));
+
+                        tarefa.appendChild(textoTarefa);
+                        tarefa.appendChild(botaoEditar);
+                        tarefa.appendChild(botaoExcluir)
+
+                        listaTarefa.appendChild(tarefa);
+                    });
+                }
+                
+            }
+        </script>
+    </body>
+</html>
